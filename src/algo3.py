@@ -16,18 +16,18 @@ class Logistic_regression():
     
     def predict(self, x):
         m, n = x.shape
-        x_1 = np.hstack((np.ones((m, 1)), x))  # Ajouter une colonne de 1 pour le biais
+        x_1 = np.hstack((np.ones((m, 1)), x))  
         mul = np.dot(x_1, self._w)
         return self.sigmoid(mul)  # Retourner les prédictions sigmoïdes
 
     def compute_cost(self, y, y_hat):
         m, _ = y.shape
         # Calcul du coût avec la somme des erreurs quadratiques
-        return - (1 / m) * np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))  # Retourner un scalaire
+        return - (1 / m) * np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))  
 
     def fits(self, x, y, learning_rate=0.001, num_iters=2000):
         m, n = x.shape
-        x_1 = np.hstack((np.ones((m, 1)), x))  # Ajouter une colonne de 1 pour le biais
+        x_1 = np.hstack((np.ones((m, 1)), x))  
         J_history = np.zeros(num_iters)
 
         for i in range(num_iters):
