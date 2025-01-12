@@ -77,8 +77,8 @@ class SVM:
                         (2 * self.lambda_param * self.w)
                 else:
                     self.w -= self.learning_rate * \
-                        (2 * self.lambda_param * self.w - np.dot(x_i, y_[idx]))
-                    self.b -= self.learning_rate * y_[idx]
+                        (2 * self.lambda_param * self.w - np.dot(x_i, y[idx]))
+                    self.b -= self.learning_rate * y[idx]
 
             print(f"{((i + 1) /self.n_iters * 100):.2f}% ...")
 
