@@ -23,8 +23,8 @@ def main():
     X_test, y_test = load_data('data/poker-hand-testing.data')
 
     algo1()
-    # algo2(X_train, X_test, y_train, y_test)
-    algo3()
+    algo2(X_train, X_test, y_train, y_test)
+    #algo3()
 
 if __name__ == "__main__":
     main()

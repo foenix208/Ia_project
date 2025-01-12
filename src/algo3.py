@@ -42,40 +42,42 @@ class Logistic_regression():
 
         return J_history  # Historique du coût , 
 
-data = pd.read_csv('data/poker-hand-training-true.data')
-prediction = [0]
-#i = 0
+def algo3():
 
-#! Boucle FOR 
-for i in range(8,9):
-    cp = data.copy()  # Create a copy of the data
-    cp.iloc[:, -1] = cp.iloc[:, -1].apply(lambda x: 1 if x != i else 0)  # Modify the last column
-    
-    #*Seppart les données 
-    x = cp.iloc[:, :-1]
-    y = cp.iloc[:, -1:]
+    data = pd.read_csv('data/poker-hand-training-true.data')
+    prediction = [0]
+    #i = 0
 
-    #* Normalisation des donnée 
-    x_mean = means = np.mean(x, axis=0) 
-    x_std = np.std(x, axis=0)
-    x_norm = (x - x_mean) / x_std
+    #! Boucle FOR 
+    for i in range(8,9):
+        cp = data.copy()  # Create a copy of the data
+        cp.iloc[:, -1] = cp.iloc[:, -1].apply(lambda x: 1 if x != i else 0)  # Modify the last column
+        
+        #*Seppart les données 
+        x = cp.iloc[:, :-1]
+        y = cp.iloc[:, -1:]
 
-    #* entrainement de l'algo 
-    log = Logistic_regression(x_norm)
-    history = log.fits(x_norm, y, learning_rate=0.01, num_iters=2500)
+        #* Normalisation des donnée 
+        x_mean = means = np.mean(x, axis=0) 
+        x_std = np.std(x, axis=0)
+        x_norm = (x - x_mean) / x_std
 
-    # Prédictions sur les données normalisées
-    predictions = log.predict(x_norm)
+        #* entrainement de l'algo 
+        log = Logistic_regression(x_norm)
+        history = log.fits(x_norm, y, learning_rate=0.01, num_iters=2500)
 
-    # Convertir les prédictions en valeurs binaires (0 ou 1)
-    predictions_binary = (predictions >= 0.5).astype(int)
+        # Prédictions sur les données normalisées
+        predictions = log.predict(x_norm)
 
-    if len(predictions_binary) == 0 :
-       prediction = predictions_binary
-    else : 
-        for t in range(len(predictions_binary)):
-            if predictions_binary[t] == 0:
-                prediction[t] = i
+        # Convertir les prédictions en valeurs binaires (0 ou 1)
+        predictions_binary = (predictions >= 0.5).astype(int)
+
+        if len(predictions_binary) == 0 :
+            prediction = predictions_binary
+        else : 
+            for t in range(len(predictions_binary)):
+                if predictions_binary[t] == 0:
+                    prediction[t] = i
 
 
-#print(prediction)
+    #print(prediction)

@@ -28,9 +28,36 @@ class SVM:
 
         return True
 
-    def fit(self, X, y):
+    def fit(self, X, y, folder, name):
+
+        # check if model was already trained
+        
+        model_file_name = f"{name}"
+        model_filepath = f"{folder}{model_file_name}"
+
+        try:
+            data = SVM.load(model_filepath)
+
+            self.X = data.X
+            self.y = data.y
+            self.version = data.version
+            self.w = data.w
+            self.b = data.b
+
+            print(f"Model loaded from file: {model_filepath}.")
+            if not self.complete():
+                self.version = VERSION
+                print(f"Model incomplete.")
+            else: return
+
+        except FileNotFoundError:
+            print(f"Model file not found. Begining training of model : {model_file_name}.")
+
+        # fit
+
+        t_a = datetime.datetime.now()
+                    
         n_samples, n_features = X.shape
-        y_ = np.where(y <= 0, -1, 1)
 
         self.X = X
         self.y = y
@@ -42,21 +69,24 @@ class SVM:
 
         for i in range(self.n_iters):
             for idx, x_i in enumerate(X):
-                condition = y_[idx] * (np.dot(x_i, self.w) - self.b) >= 1
+                condition = y[idx] * (np.dot(x_i, self.w) - self.b) >= 1
                 if condition:
                     self.w -= self.learning_rate * (2 * self.lambda_param * self.w)
                 else:
-                    self.w -= self.learning_rate * (2 * self.lambda_param * self.w - np.dot(x_i, y_[idx]))
-                    self.b -= self.learning_rate * y_[idx]
+                    self.w -= self.learning_rate * (2 * self.lambda_param * self.w - np.dot(x_i, y[idx]))
+                    self.b -= self.learning_rate * y[idx]
 
             print (f"{((i + 1) /self.n_iters * 100):.2f}% ...")
 
         print ("Training complete.")
+        print (f"{ (datetime.datetime.now() - t_a).seconds } s elapsed")
+
+        self.save(model_filepath)
+        print(f"Model saved under '{model_filepath}'.")
 
     def predict(self, X_t):
         approx = np.dot(X_t, self.w)
-        # np.sign (approx) maybe ?
-        return approx
+        return np.sign(approx)
     
     def save(self, filepath):
         with open(filepath, 'wb') as file:
@@ -65,8 +95,8 @@ class SVM:
     def load(filepath):
         with open(filepath, 'rb') as file:
             return pickle.load(file)
-
-# TODO move some of the save n' load code into SVM.fit
+        
+        
 def fit_multi_class(X, y, folder, prefix):
     k = len(np.unique(y))
 
@@ -81,29 +111,8 @@ def fit_multi_class(X, y, folder, prefix):
         model = SVM()
 
         model_file_name = f"{prefix}_model_feature_{i}"
-        model_filepath = f"{folder}{model_file_name}"
 
-        try:
-            model = SVM.load(model_filepath)
-            print(f"Model loaded from file: {model_filepath}.")
-            if not model.complete():
-                model.version = VERSION
-                print(f"Model incomplete, begining training...")
-                t_a = datetime.datetime.now()
-                model.fit(Xs, ys)
-                print (f"{ (datetime.datetime.now() - t_a).seconds } s elapsed")
-
-                model.save(model_filepath)
-                print(f"Model saved under '{model_filepath}'.")
-
-        except FileNotFoundError:
-            print(f"Model file not found. Begining training of model : {model_file_name}.")
-            t_a = datetime.datetime.now()
-            model.fit(Xs, ys)
-            print (f"{ (datetime.datetime.now() - t_a).seconds } s elapsed")
-
-            model.save(model_filepath)
-            print(f"Model saved under '{model_filepath}'.")
+        model.fit(Xs, ys, folder, model_file_name)
 
         models.append(model)
 
@@ -118,7 +127,7 @@ def predict_multi_class(X, Clfs):
     for i, clf in enumerate(Clfs):
         pred = clf.predict(X)
 
-        print (f"[{i}] max: {pred.max(axis=0)}, min: {pred.min(axis=0)}")
+        # print (f"[{i}] max: {pred.max(axis=0)}, min: {pred.min(axis=0)}")
 
         preds[:, i] = pred
     
@@ -145,5 +154,4 @@ def algo2(X_train, X_test, y_train, y_test):
 
     # Calculer la précision
     accuracy = sum(1 for i in range(len(y_test)) if y_test[i] == y_pred[0][i]) / len(y_test)
-    print (f"max {y_pred[0].max(axis=0)}")
     print(f'Accuracy: {accuracy:.2f}')
