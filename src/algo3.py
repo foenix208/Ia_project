@@ -4,28 +4,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import random
 
-# * Creation de la class Logistic_regression
-
-
 class Logistic_regression():
     def __init__(self, x, seed=123):
         m, n = x.shape
         np.random.seed(seed)
-        self._w = np.random.rand(n + 1, 1)  # Poids (initialisation aléatoire)
-
+        self._w = np.random.rand(n + 1, 1)  
+    
     def sigmoid(self, z):
-        return 1 / (1 + np.exp(-z))  # Fonction sigmoïde
-
+        return 1 / (1 + np.exp(-z)) 
+    
     def predict(self, x):
         m, n = x.shape
         x_1 = np.hstack((np.ones((m, 1)), x))
         mul = np.dot(x_1, self._w)
-        return self.sigmoid(mul)  # Retourner les prédictions sigmoïdes
+        return self.sigmoid(mul)  
 
     def compute_cost(self, y, y_hat):
         m, _ = y.shape
-        # Calcul du coût avec la somme des erreurs quadratiques
-        return - (1 / m) * np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))
+        return - (1 / m) * np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))  
 
     def fits(self, x, y, learning_rate=0.001, num_iters=2000):
         m, n = x.shape
@@ -33,17 +29,11 @@ class Logistic_regression():
         J_history = np.zeros(num_iters)
 
         for i in range(num_iters):
-            # Calcul des prédictions
             predictions = self.predict(x)
-
-            # Mise à jour des poids (descente de gradient)
-            self._w = self._w - (learning_rate / m) * \
-                np.dot(x_1.T, (predictions - y))
-
-            # Calcul du coût à chaque itération et mise à jour de J_history
+            self._w = self._w - (learning_rate / m) * np.dot(x_1.T, (predictions - y))
             J_history[i] = self.compute_cost(y, predictions)
 
-        return J_history  # Historique du coût ,
+        return J_history  # Historique du coût , 
 
 
 data = pd.read_csv('data/poker-hand-training-true.data')
